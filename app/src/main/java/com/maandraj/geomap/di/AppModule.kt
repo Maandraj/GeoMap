@@ -21,6 +21,8 @@ class AppModel {
     fun provideOkHttp(): OkHttpClient = OkHttpClient.Builder().apply {
         addInterceptor(HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
+
+
         })
     }.build()
 
@@ -37,4 +39,4 @@ class AppModel {
             .baseUrl(BASE_URL)
             .build()
 }
-private const val BASE_URL = "https://www.gamerpower.com/api/"
+private const val BASE_URL = "https://waadsu.com/api/"
