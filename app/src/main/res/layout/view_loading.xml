@@ -2,11 +2,14 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:alpha="0.5"
-
-    android:background="?colorSurface"
-    android:visibility="visible">
-
+  >
+    <FrameLayout
+        android:id="@+id/shadow_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.3"
+        android:background="?colorSurface"
+        android:visibility="visible"/>
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/civ_loading"
         android:layout_width="wrap_content"

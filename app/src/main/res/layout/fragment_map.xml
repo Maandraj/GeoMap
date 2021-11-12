@@ -1,23 +1,285 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_height="match_parent">
 
-
-
-    <fragment
-
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/main_barrier"
         tools:context="com.example.polygons.PolyActivity"
-        tools:visibility="visible"/>
+        tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/main_barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="other_settings_group" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/other_settings_group"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:constraint_referenced_ids="et_firstMarker, tg_group_location, et_secondMarker,  ll_btn_menu, tg_group_directions,"
+        tools:visibility="visible" />
+
+    <LinearLayout
+        android:id="@+id/ll_panel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_distance"
+        app:layout_goneMarginTop="5dp"
+
+
+        tools:visibility="visible">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/iv_zoom_out"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="2dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_zoom_out"
+            app:tint="@color/elements_map_color" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/iv_zoom_out_loupe"
+            android:layout_width="32dp"
+            android:layout_height="35dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="2dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_zoom_out_loupe"
+            app:tint="@color/elements_map_color" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/iv_zoom_in_loupe"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="2dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_zoom_in_loupe"
+            app:tint="@color/elements_map_color" />
+    </LinearLayout>
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/iv_menu"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_baseline_menu_24"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/elements_map_color"
+        tools:visibility="gone" />
+
+
+    <EditText
+        android:id="@+id/et_firstMarker"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="@dimen/start_margin_map"
+        android:digits="1234567890.,"
+        android:hint="@string/lat_lng"
+        android:imeOptions="actionSearch"
+
+        android:importantForAutofill="no"
+        android:inputType="textFilter"
+        android:singleLine="true"
+        android:textSize="13sp"
+        app:layout_constraintEnd_toStartOf="@+id/tg_group_location"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tg_group_location" />
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/tg_group_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:singleSelection="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tg_lat_location"
+
+            style="@style/Widget.App.Button.OutlinedButton.IconOnly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:backgroundTint="@android:color/transparent"
+            android:insetTop="8dp"
+            android:insetBottom="8dp"
+            app:icon="@drawable/location_checkable"
+            app:strokeWidth="0dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tg_lng_location"
+            style="@style/Widget.App.Button.OutlinedButton.IconOnly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+
+            android:backgroundTint="@android:color/transparent"
+            app:icon="@drawable/location_checkable"
+            app:strokeWidth="0dp" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/tg_group_directions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@id/main_barrier"
+        app:checkedButton="@id/tg_walking"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ll_btn_menu"
+        app:singleSelection="true">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tg_walking"
+            style="@style/Widget.App.Button.OutlinedButton.IconOnly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:backgroundTint="@android:color/transparent"
+            app:icon="@drawable/ic_directions_walk"
+            app:strokeWidth="0dp" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tg_driving"
+
+            style="@style/Widget.App.Button.OutlinedButton.IconOnly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:backgroundTint="@android:color/transparent"
+            app:icon="@drawable/ic_directions_drive"
+            app:strokeWidth="0dp" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tg_transit"
+            style="@style/Widget.App.Button.OutlinedButton.IconOnly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:backgroundTint="@android:color/transparent"
+            app:icon="@drawable/ic_directions_transit"
+            app:strokeWidth="0dp" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tg_bicycling"
+            style="@style/Widget.App.Button.OutlinedButton.IconOnly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:backgroundTint="@android:color/transparent"
+            app:icon="@drawable/ic_directions_bicycling"
+            app:strokeWidth="0dp" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+    <EditText
+        android:id="@+id/et_secondMarker"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:digits="1234567890.,"
+        android:hint="@string/lat_lng"
+        android:imeOptions="actionSearch"
+        android:importantForAutofill="no"
+
+        android:inputType="textFilter"
+        android:singleLine="true"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="@+id/tg_group_location"
+        app:layout_constraintEnd_toStartOf="@+id/tg_group_location"
+        app:layout_constraintStart_toStartOf="@+id/et_firstMarker"
+        app:layout_constraintTop_toBottomOf="@+id/et_firstMarker" />
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_coordinates"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="@string/get_server_coordinates"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="visible" />
+
+    <LinearLayout
+        android:id="@+id/ll_btn_menu"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="5dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tg_group_location">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_close"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/close"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:backgroundTint="@color/shadow_red"
+            app:layout_constraintBottom_toBottomOf="@id/btn_route"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/btn_route"
+            app:layout_constraintVertical_bias="0.0" />
+
+
+        <ToggleButton
+            android:id="@+id/tg_auto_zoom"
+            android:layout_width="135dp"
+            android:layout_height="30dp"
+
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
+            android:background="@drawable/auto_zoom_checkable"
+            android:checked="false"
+            android:textColor="@color/white"
+            android:textOff="@string/auto_zoom_off"
+            android:textOn="@string/auto_zoom_on"
+            android:textSize="12sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_route"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/route"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+    </LinearLayout>
+
     <include
         android:id="@+id/loading"
         layout="@layout/view_loading"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -27,9 +289,33 @@
         android:id="@+id/tv_distance"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:textColor="@color/black"
+        android:layout_marginStart="@dimen/start_margin_map"
+        android:layout_marginTop="5dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/elements_map_color"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/iv_menu"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="2.955124277606622E8" />
+        app:layout_constraintTop_toBottomOf="@id/tv_time"
+        tools:text="2.955124277606622E8"
+        tools:visibility="visible" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tv_time"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/start_margin_map"
+        android:layout_marginTop="5dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+
+        android:textColor="@color/elements_map_color"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/main_barrier"
+        tools:text="11 min."
+        tools:visibility="visible" />
 </androidx.constraintlayout.widget.ConstraintLayout>

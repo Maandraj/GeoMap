@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="distance">Расстояние</string>
     <string name="meter_squared">м²</string>
-    <string name="length">Длина</string>
+    <string name="km_squared">км²</string>
+    <string name="meter">м</string>
+    <string name="km">км</string>
+    <string name="get_server_coordinates">Получить координаты из сервера</string>
+    <string name="route">Маршрут</string>
+
+    <string name="map_not_ready">Карта ещё не готова</string>
+    <string name="lat_lng">Широта, долгота</string>
+    <string name="invalid_coordinates">Неверные координаты</string>
+
+    <string name="close">Закрыть</string>
+    <string name="auto_zoom_off">Авто-зум - выкл</string>
+    <string name="auto_zoom_on">Авто-зум - вкл</string>
+    <string name="Unknown">Неизвестно</string>
+    <string name="coordinates_exception">Возникла ошибка, попробуйте ещё раз.</string>
+    <string name="no_routes_found.">Маршрутов не найдено.</string>
 
 </resources>

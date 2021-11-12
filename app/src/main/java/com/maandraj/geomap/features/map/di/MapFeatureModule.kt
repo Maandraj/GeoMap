@@ -1,6 +1,6 @@
 package com.maandraj.geomap.features.map.di
 
-import com.maandraj.geomap.features.map.data.api.WaadsuApi
+import com.maandraj.geomap.features.map.data.api.MapApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,5 +12,5 @@ import retrofit2.Retrofit
 class MapFeatureModule {
     @Provides
     fun provideWaadsuApi(retrofit: Retrofit) =
-        retrofit.create(WaadsuApi::class.java)
+        retrofit.create(MapApi::class.java)
 }
