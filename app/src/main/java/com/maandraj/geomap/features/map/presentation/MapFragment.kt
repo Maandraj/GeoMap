@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -22,19 +21,13 @@ import com.google.maps.android.SphericalUtil
 import com.maandraj.geomap.R
 import com.maandraj.geomap.databinding.FragmentMapBinding
 import com.maandraj.geomap.features.map.data.domain.model.Coordinates
-import com.maandraj.geomap.features.map.data.domain.model.Geometry
 import com.maandraj.geomap.utils.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
-import java.text.DecimalFormat
 import java.util.*
 import android.content.res.Resources
 
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.PolyUtil
-import com.maandraj.geomap.BuildConfig.MAPS_API_KEY
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 import com.google.android.gms.maps.model.BitmapDescriptor
@@ -51,6 +44,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
     private var manualCoordinates: Boolean = true
     private lateinit var latLangBounds: LatLngBounds
     private var routePolyline: Polyline? = null
+    private var routePolygon: MutableList<Polygon?> = mutableListOf()
     private var systemGeometry: String = ""
     private var distanceText = ""
     private var typeRoute = "walking"
@@ -181,6 +175,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
      */
     override fun onMapReady(p0: GoogleMap) {
         map = p0
+        map.setOnMarkerClickListener(this)
         when (requireContext().resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
             Configuration.UI_MODE_NIGHT_YES -> setStyleMap()
         }
@@ -210,7 +205,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
             drawRoute()
         }
         viewModel.direction.observe(viewLifecycleOwner, {
-
+            routePolyline = null
             viewBinding.tvTime.visibility = View.VISIBLE
             val steps: MutableList<MutableList<LatLng>> = mutableListOf()
             for (route in it.routes) {
@@ -281,7 +276,6 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
         var addresses: List<Address> = listOf()
         val geocoder = Geocoder(requireContext(), Locale.getDefault())
         addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-        map.setOnMarkerClickListener(this)
         var title: String? = null
         if (addresses.isNotEmpty()) {
             val locality = listOf<String?>(
@@ -342,6 +336,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
     fun getMarkerIcon(color: String?): BitmapDescriptor? {
         val hsv = FloatArray(3)
         Color.colorToHSV(Color.parseColor(color), hsv)
+
         return BitmapDescriptorFactory.defaultMarker(hsv[0])
     }
 
@@ -354,7 +349,13 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
      * Строение маршрута по координатам, также вычесление расстояния и примерного времени до точки
      */
     private fun drawRoute() {
+
         if (startMarker != null && endMarker != null) {
+            routePolygon.forEach {
+                it?.isVisible = false
+                it?.points = listOf(LatLng(0.0,0.0))
+                it?.remove()
+            }
             viewModel.getDirection(
                 origin = "${startMarker!!.position.latitude},${startMarker!!.position.longitude}",
                 destination = "${endMarker!!.position.latitude},${endMarker!!.position.longitude}",
@@ -376,12 +377,12 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
         endMarker = null
         routePolyline = null
         map.clear()
+
         val polygons = coordinates.features[0].geometry.polygons
         Log.i("GMap", "Polygons size: ${polygons.size}")
         var distance: Double = 0.0
         val allCoordinates: MutableList<LatLng> = mutableListOf()
         val boundsBuilder = LatLngBounds.builder()
-
         for (_polygon in polygons) {
             val polygonOptions = PolygonOptions()
             for (_hole in _polygon.holes) {
@@ -396,7 +397,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
             polygonOptions
                 .strokeColor(requireActivity().getColor(R.color.stroke_color))
                 .strokeWidth(5.0f)
-            map.addPolygon(polygonOptions)
+            routePolygon.add(  map.addPolygon(polygonOptions))
 
         }
         allCoordinates.forEach {
