@@ -33,46 +33,41 @@
         android:id="@+id/ll_panel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
         android:orientation="vertical"
         android:visibility="gone"
-        android:layout_marginEnd="5dp"
-
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_distance"
-
-
-        app:layout_goneMarginTop="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible">
 
         <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/iv_zoom_out"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginStart="2dp"
-            android:layout_marginTop="2dp"
+            android:id="@+id/iv_zoom_in_loupe"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_zoom_out"
+            android:src="@drawable/ic_zoom_in_loupe"
             app:tint="@color/elements_map_color" />
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/iv_zoom_out_loupe"
-            android:layout_width="32dp"
-            android:layout_height="35dp"
-            android:layout_marginStart="2dp"
-            android:layout_marginTop="2dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginTop="4dp"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_zoom_out_loupe"
             app:tint="@color/elements_map_color" />
 
         <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/iv_zoom_in_loupe"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginStart="2dp"
-            android:layout_marginTop="2dp"
+            android:id="@+id/iv_zoom_out"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginTop="4dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_zoom_in_loupe"
+            android:src="@drawable/ic_zoom_out"
             app:tint="@color/elements_map_color" />
+
+
     </LinearLayout>
 
     <com.google.android.material.imageview.ShapeableImageView
@@ -85,9 +80,9 @@
         android:src="@drawable/ic_baseline_menu_24"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/main_barrier"
         app:tint="@color/elements_map_color"
-        tools:visibility="gone" />
+        tools:visibility="visible" />
 
 
     <EditText
@@ -125,6 +120,7 @@
             android:backgroundTint="@android:color/transparent"
             android:insetTop="8dp"
             android:insetBottom="8dp"
+
             app:icon="@drawable/location_checkable"
             app:strokeWidth="0dp" />
 
@@ -145,12 +141,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@id/main_barrier"
         app:checkedButton="@id/tg_walking"
+        app:layout_constraintBottom_toTopOf="@id/main_barrier"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ll_btn_menu"
         app:singleSelection="true">
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/tg_walking"
             style="@style/Widget.App.Button.OutlinedButton.IconOnly"
@@ -160,6 +157,7 @@
             android:backgroundTint="@android:color/transparent"
             app:icon="@drawable/ic_directions_walk"
             app:strokeWidth="0dp" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/tg_driving"
 
@@ -170,6 +168,7 @@
             android:backgroundTint="@android:color/transparent"
             app:icon="@drawable/ic_directions_drive"
             app:strokeWidth="0dp" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/tg_transit"
             style="@style/Widget.App.Button.OutlinedButton.IconOnly"
@@ -179,6 +178,7 @@
             android:backgroundTint="@android:color/transparent"
             app:icon="@drawable/ic_directions_transit"
             app:strokeWidth="0dp" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/tg_bicycling"
             style="@style/Widget.App.Button.OutlinedButton.IconOnly"
@@ -190,6 +190,7 @@
             app:strokeWidth="0dp" />
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
+
     <EditText
         android:id="@+id/et_secondMarker"
         android:layout_width="0dp"
@@ -240,10 +241,10 @@
             android:id="@+id/btn_close"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
+            android:ellipsize="end"
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:text="@string/close"
-            android:ellipsize="end"
 
             android:textColor="@color/white"
             android:textSize="12sp"
@@ -258,12 +259,12 @@
             android:id="@+id/tg_auto_zoom"
             android:layout_width="135dp"
             android:layout_height="30dp"
-            android:ellipsize="end"
-
             android:layout_marginStart="20dp"
+
             android:layout_marginEnd="20dp"
             android:background="@drawable/auto_zoom_checkable"
             android:checked="false"
+            android:ellipsize="end"
             android:textColor="@color/white"
             android:textOff="@string/auto_zoom_off"
             android:textOn="@string/auto_zoom_on"
@@ -294,15 +295,15 @@
         android:id="@+id/tv_distance"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="5dp"
         android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
         android:ellipsize="end"
-        android:maxLines="1"
         android:gravity="end"
+        android:maxLines="1"
 
         android:textColor="@color/elements_map_color"
         android:visibility="gone"
-        app:layout_constraintEnd_toStartOf="@+id/iv_menu"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_time"
         tools:text="2.955124277606622E8"
@@ -317,14 +318,14 @@
         android:layout_marginEnd="5dp"
 
         android:ellipsize="end"
-        android:maxLines="1"
         android:gravity="end"
+        android:maxLines="1"
         android:textColor="@color/elements_map_color"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
 
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/main_barrier"
+        app:layout_constraintTop_toBottomOf="@id/iv_menu"
         tools:text="11 min."
         tools:visibility="visible" />
 </androidx.constraintlayout.widget.ConstraintLayout>

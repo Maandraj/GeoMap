@@ -193,6 +193,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
             }
         }
         map.setOnMapClickListener {
+            viewBinding.btnCoordinates.visibility = View.VISIBLE
             if (!manualCoordinates)
                 addMarker(it)
         }
@@ -248,7 +249,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
         var addresses: List<Address> = listOf()
         val geocoder = Geocoder(requireContext(), Locale.getDefault())
         addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-
+        map.setOnMarkerClickListener(this)
         var title: String? = null
         if (addresses.isNotEmpty()) {
             val locality = listOf<String?>(
@@ -269,8 +270,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
         viewModel.setAlert(title ?: getString(R.string.Unknown))
 
         val markerOptions = MarkerOptions().position(latLng).title(title)
-        if (viewBinding.tgAutoZoom.isChecked)
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14F))
+
 
         when (addMarkerButton) {
 
@@ -285,6 +285,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
                 } else {
                     startMarker!!.title = title ?: getString(R.string.Unknown)
                     startMarker!!.position = latLng
+
                 }
 
             }
@@ -302,6 +303,8 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
                 viewBinding.etSecondMarker.setText("${latLng.latitude}, ${latLng.longitude}")
             }
         }
+        if (viewBinding.tgAutoZoom.isChecked)
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14F))
         addMarkerButton?.isChecked = false
 
     }
@@ -313,6 +316,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
     }
 
     override fun onMarkerClick(marker: Marker): Boolean {
+        viewBinding.btnCoordinates.visibility = View.GONE
         return true
     }
 
