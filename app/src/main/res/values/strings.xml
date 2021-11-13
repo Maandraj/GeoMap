@@ -1,5 +1,19 @@
 <resources>
     <string name="app_name" translatable="false">GeoMap</string>
     <string name="meter_squared">m²</string>
-    <string name="length">length</string>
+    <string name="km_squared">km²</string>
+    <string name="meter">m</string>
+    <string name="km">km</string>
+    <string name="distance">Distance</string>
+    <string name="get_server_coordinates">Get server coordinates</string>
+    <string name="route">Route</string>
+    <string name="map_not_ready">Map not ready</string>
+    <string name="lat_lng">Latitude, longitude</string>
+    <string name="close">Close</string>
+    <string name="invalid_coordinates">Invalid coordinates</string>
+    <string name="auto_zoom_off">Auto-zoom - off</string>
+    <string name="auto_zoom_on">Auto-zoom - on</string>
+    <string name="Unknown">Unknown</string>
+    <string name="coordinates_exception">There was an error, again.</string>
+    <string name="no_routes_found.">No routes found.</string>
 </resources>

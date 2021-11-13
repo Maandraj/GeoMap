@@ -39,4 +39,5 @@ class AppModel {
             .baseUrl(BASE_URL)
             .build()
 }
-private const val BASE_URL = "https://waadsu.com/api/"
+
+private const val BASE_URL = "https://maps.googleapis.com/maps/api/"
