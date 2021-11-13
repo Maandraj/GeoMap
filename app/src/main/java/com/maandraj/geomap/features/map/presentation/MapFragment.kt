@@ -258,11 +258,12 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
                 addresses[0].subAdminArea,
                 addresses[0].locality,
                 addresses[0].postalCode
-            ).distinct()
-            title =
-                "$locality".substring(1, "$locality".length - 1).replace(
-                    ", null",
-                    "")
+            ).distinct().filterNotNull()
+            if (locality.isNotEmpty())
+                title =
+                    "$locality".substring(1, "$locality".length - 1)
+            else
+                title = null
         }
         viewModel.setAlert(title ?: getString(R.string.Unknown))
 
