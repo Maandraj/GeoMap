@@ -73,10 +73,11 @@ class MapViewModel @Inject constructor(
             _loadingState.postValue(true)
 
             try {
-                _direction.postValue(coordinatesInteractor.getDirection(origin = origin,
+                val direction = coordinatesInteractor.getDirection(origin = origin,
                     destination = destination,
                     language = language,
-                    mode = mode))
+                    mode = mode)
+                _direction.postValue(direction)
             }catch (ex : JsonDataException){
                 _alert.postValue("Маршрутов не найдено.")
             }

@@ -209,6 +209,38 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
         viewBinding.btnRoute.setOnClickListener {
             drawRoute()
         }
+        viewModel.direction.observe(viewLifecycleOwner, {
+
+            viewBinding.tvTime.visibility = View.VISIBLE
+            val steps: MutableList<MutableList<LatLng>> = mutableListOf()
+            for (route in it.routes) {
+                for (leg in route.legs) {
+                    viewModel.setDistance(leg.distance.value.toDouble())
+                    viewBinding.tvTime.text = leg.duration.text
+                    distanceText = leg.distance.text
+                    for (step in leg.steps) {
+                        val startLatLng = PolyUtil.decode(step.polyline.points)
+                        steps.add(startLatLng)
+                    }
+                }
+            }
+            val allPoints = mutableListOf<LatLng>()
+            steps.forEach { _steps ->
+                _steps.forEach { point -> allPoints.add(point) }
+            }
+            if (routePolyline != null)
+                routePolyline!!.points = allPoints
+            else {
+                val polylineOptions =
+                    PolylineOptions().addAll(allPoints)
+                        .color(requireActivity().getColor(R.color.stroke_color))
+                        .startCap(RoundCap())
+                        .endCap(RoundCap())
+
+                routePolyline = map.addPolyline(polylineOptions)
+            }
+            routePolyline?.isVisible = true
+        })
     }
 
     /**
@@ -261,16 +293,16 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
                 addresses[0].locality,
                 addresses[0].postalCode
             ).distinct().filterNotNull()
-            if (locality.isNotEmpty())
-                title =
-                    "$locality".substring(1, "$locality".length - 1)
+            title = if (locality.isNotEmpty())
+                "$locality".substring(1, "$locality".length - 1)
             else
-                title = null
+                null
         }
         viewModel.setAlert(title ?: getString(R.string.Unknown))
 
         val markerOptions = MarkerOptions().position(latLng).title(title)
 
+        routePolyline?.points = listOf<LatLng>(LatLng(0.0, 0.0))
 
         when (addMarkerButton) {
 
@@ -279,26 +311,23 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
                 viewBinding.etFirstMarker.setText("${latLng.latitude}, ${latLng.longitude}")
                 val color = requireActivity().resources.getString(R.color.stroke_color);
 
-                if (startMarker == null || isClearMap) {
-                    isClearMap = false
+                if (startMarker == null ) {
                     startMarker = map.addMarker(markerOptions.icon(getMarkerIcon(color)))
                 } else {
                     startMarker!!.title = title ?: getString(R.string.Unknown)
                     startMarker!!.position = latLng
-
                 }
 
             }
             viewBinding.tgLngLocation -> {
-                if (endMarker == null || isClearMap) {
-                    isClearMap = false
-
+                if (endMarker == null) {
                     endMarker =
                         map.addMarker(markerOptions.icon(BitmapDescriptorFactory.defaultMarker(
                             BitmapDescriptorFactory.HUE_RED)))
                 } else {
                     endMarker!!.title = title ?: getString(R.string.Unknown)
                     endMarker!!.position = latLng
+
                 }
                 viewBinding.etSecondMarker.setText("${latLng.latitude}, ${latLng.longitude}")
             }
@@ -306,6 +335,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
         if (viewBinding.tgAutoZoom.isChecked)
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14F))
         addMarkerButton?.isChecked = false
+
 
     }
 
@@ -330,49 +360,21 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
                 destination = "${endMarker!!.position.latitude},${endMarker!!.position.longitude}",
                 mode = typeRoute
             )
-            viewModel.direction.observe(viewLifecycleOwner, {
-                viewBinding.tvTime.visibility = View.VISIBLE
-                val steps: MutableList<MutableList<LatLng>> = mutableListOf()
-                for (route in it.routes) {
-                    for (leg in route.legs) {
-                        viewModel.setDistance(leg.distance.value.toDouble())
-                        viewBinding.tvTime.text = leg.duration.text
-                        distanceText = leg.distance.text
-                        for (step in leg.steps) {
-                            val startLatLng = PolyUtil.decode(step.polyline.points)
-                            steps.add(startLatLng)
-                        }
-                    }
-                }
-                val allPoints = mutableListOf<LatLng>()
-                steps.forEach { _steps ->
-                    _steps.forEach { point -> allPoints.add(point) }
-                }
-                if (routePolyline != null)
-                    routePolyline!!.points = allPoints
-                else {
-                    val polylineOptions =
-                        PolylineOptions().addAll(allPoints)
-                            .color(requireActivity().getColor(R.color.stroke_color))
-                            .startCap(RoundCap())
-                            .endCap(RoundCap())
-                    routePolyline = map.addPolyline(polylineOptions)
-                }
-
-            })
         } else {
             viewModel.setAlert(requireActivity().getString(R.string.invalid_coordinates))
         }
 
     }
 
-    private var isClearMap: Boolean = false
 
     /**
      * Рисование полигона, пригодится когда надо выделить участки
      */
     private fun drawPolygon() {
-        isClearMap = true
+        viewBinding.tvTime.visibility = View.GONE
+        startMarker = null
+        endMarker = null
+        routePolyline = null
         map.clear()
         val polygons = coordinates.features[0].geometry.polygons
         Log.i("GMap", "Polygons size: ${polygons.size}")
@@ -401,7 +403,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
             boundsBuilder.include(it)
         }
         latLangBounds = boundsBuilder.build()
-        addMarker(latLangBounds.center)
+
 
         if (viewBinding.tgAutoZoom.isChecked)
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLangBounds.center, 1F))
