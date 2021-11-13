@@ -48,7 +48,7 @@ class MapViewModel @Inject constructor(
     fun getAllCoordinates() {
         viewModelScope.launch {
             _loadingState.postValue(true)
-           val context =
+
             try {
                 _coordinates.postValue(coordinatesInteractor.getAllCoordinates())
 

@@ -75,10 +75,12 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
                 hideKeyboard()
                 viewBinding.otherSettingsGroup.visibility = View.GONE
                 viewBinding.ivMenu.visibility = View.VISIBLE
+                viewBinding.btnCoordinates.visibility = View.VISIBLE
             }
         }
         with(viewBinding.ivMenu) {
             setOnClickListener {
+                viewBinding.btnCoordinates.visibility = View.GONE
                 it.visibility = View.GONE
                 viewBinding.otherSettingsGroup.visibility = View.VISIBLE
             }
@@ -205,7 +207,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
             drawRoute()
         }
         viewModel.direction.observe(viewLifecycleOwner, {
-            routePolyline = null
+
             viewBinding.tvTime.visibility = View.VISIBLE
             val steps: MutableList<MutableList<LatLng>> = mutableListOf()
             for (route in it.routes) {
@@ -245,7 +247,15 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
     private fun manualTextCoordinates(v: TextView): Boolean {
         val indexComma = v.text.indexOf(",")
         val indexPoint = v.text.indexOf(".")
-        if (indexComma != -1 && indexComma + 1 != indexPoint && indexComma - 1 != indexPoint) {
+        var countComma = 0
+        var countPoint = 0
+        v.text.forEach {
+            if (it == ',')
+                countComma++
+            else if(it == '.')
+                countPoint++
+        }
+        if (indexComma != -1 && indexComma + 1 != indexPoint && indexComma - 1 != indexPoint && countComma == 1 && countPoint == 2) {
             return if (v.text.toString().substringBefore(",").isNotEmpty() && v.text.toString()
                     .substringAfter(",")
                     .isNotEmpty()
@@ -305,7 +315,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
                 viewBinding.etFirstMarker.setText("${latLng.latitude}, ${latLng.longitude}")
                 val color = requireActivity().resources.getString(R.color.stroke_color);
 
-                if (startMarker == null ) {
+                if (startMarker == null) {
                     startMarker = map.addMarker(markerOptions.icon(getMarkerIcon(color)))
                 } else {
                     startMarker!!.title = title ?: getString(R.string.Unknown)
@@ -353,7 +363,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
         if (startMarker != null && endMarker != null) {
             routePolygon.forEach {
                 it?.isVisible = false
-                it?.points = listOf(LatLng(0.0,0.0))
+                it?.points = listOf(LatLng(0.0, 0.0))
                 it?.remove()
             }
             viewModel.getDirection(
@@ -397,7 +407,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
             polygonOptions
                 .strokeColor(requireActivity().getColor(R.color.stroke_color))
                 .strokeWidth(5.0f)
-            routePolygon.add(  map.addPolygon(polygonOptions))
+            routePolygon.add(map.addPolygon(polygonOptions))
 
         }
         allCoordinates.forEach {
