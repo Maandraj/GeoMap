@@ -31,13 +31,13 @@ import com.google.maps.android.PolyUtil
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 import com.google.android.gms.maps.model.BitmapDescriptor
+import java.io.IOException
 
 @AndroidEntryPoint
 class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickListener,
     OnMapReadyCallback {
     private val viewModel: MapViewModel by viewModels()
     private val viewBinding: FragmentMapBinding by viewBinding(FragmentMapBinding::bind)
-    private lateinit var coordinates: Coordinates
     private lateinit var options: GoogleMapOptions
     private lateinit var map: GoogleMap
     private var addMarkerButton: MaterialButton? = null
@@ -147,13 +147,11 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
         })
         options.mapType(GoogleMap.MAP_TYPE_HYBRID)
         options.zoomControlsEnabled(false)
-        viewModel.coordinates.observe(viewLifecycleOwner, {
-            coordinates = it
-            val mapFragment = childFragmentManager
-                .findFragmentById(R.id.map) as SupportMapFragment?
-            SupportMapFragment.newInstance(options)
-            mapFragment?.getMapAsync(this)
-        })
+        val mapFragment = childFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment?
+        SupportMapFragment.newInstance(options)
+        mapFragment?.getMapAsync(this)
+
     }
 
     /**
@@ -175,24 +173,31 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
     /**
      * Подготовка карты и камеры для рисование маршрутов
      */
+
     override fun onMapReady(p0: GoogleMap) {
+        viewBinding.map.visibility = View.VISIBLE
+
         map = p0
         map.setOnMarkerClickListener(this)
         when (requireContext().resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
             Configuration.UI_MODE_NIGHT_YES -> setStyleMap()
         }
+        viewModel.coordinates.observe(viewLifecycleOwner, {
+            drawPolygon(it)
+        })
         viewBinding.ivMenu.visibility = View.VISIBLE
         viewBinding.llPanel.visibility = View.VISIBLE
         with(viewBinding.btnCoordinates) {
             visibility = View.VISIBLE
             setOnClickListener {
-                drawPolygon()
+                viewModel.getServerCoordinates()
             }
         }
         map.setOnMapClickListener {
             viewBinding.btnCoordinates.visibility = View.VISIBLE
-            if (!manualCoordinates)
+            if (!manualCoordinates) {
                 addMarker(it)
+            }
         }
         viewBinding.ivZoomOut.setOnClickListener {
             map.moveCamera(CameraUpdateFactory.zoomTo(1.0f))
@@ -205,9 +210,11 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
         }
         viewBinding.btnRoute.setOnClickListener {
             drawRoute()
+
         }
         viewModel.direction.observe(viewLifecycleOwner, {
 
+            drawRoute()
             viewBinding.tvTime.visibility = View.VISIBLE
             val steps: MutableList<MutableList<LatLng>> = mutableListOf()
             for (route in it.routes) {
@@ -240,6 +247,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
         })
     }
 
+
     /**
      * Установка и валидация координат которые ввел пользователь
      */
@@ -252,7 +260,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
         v.text.forEach {
             if (it == ',')
                 countComma++
-            else if(it == '.')
+            else if (it == '.')
                 countPoint++
         }
         if (indexComma != -1 && indexComma + 1 != indexPoint && indexComma - 1 != indexPoint && countComma == 1 && countPoint == 2) {
@@ -264,6 +272,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
                 val lng = v.text.toString().substringAfter(",").toDouble()
                 val latLng = LatLng(lat, lng)
                 v.text = "${latLng.latitude},${latLng.longitude}"
+
                 addMarker(latLng)
                 false
             } else {
@@ -282,63 +291,66 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
      */
     @SuppressLint("SetTextI18n", "ResourceType")
     private fun addMarker(latLng: LatLng) {
-
-        var addresses: List<Address> = listOf()
-        val geocoder = Geocoder(requireContext(), Locale.getDefault())
-        addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-        var title: String? = null
-        if (addresses.isNotEmpty()) {
-            val locality = listOf<String?>(
-                addresses[0].countryName,
-                addresses[0].adminArea,
-                addresses[0].subAdminArea,
-                addresses[0].locality,
-                addresses[0].subAdminArea,
-                addresses[0].locality,
-                addresses[0].postalCode
-            ).distinct().filterNotNull()
-            title = if (locality.isNotEmpty())
-                "$locality".substring(1, "$locality".length - 1)
-            else
-                null
-        }
-        viewModel.setAlert(title ?: getString(R.string.Unknown))
-
-        val markerOptions = MarkerOptions().position(latLng).title(title)
-
-        routePolyline?.points = listOf<LatLng>(LatLng(0.0, 0.0))
-
-        when (addMarkerButton) {
-
-            viewBinding.tgLatLocation,
-            -> {
-                viewBinding.etFirstMarker.setText("${latLng.latitude}, ${latLng.longitude}")
-                val color = requireActivity().resources.getString(R.color.stroke_color);
-
-                if (startMarker == null) {
-                    startMarker = map.addMarker(markerOptions.icon(getMarkerIcon(color)))
-                } else {
-                    startMarker!!.title = title ?: getString(R.string.Unknown)
-                    startMarker!!.position = latLng
-                }
-
+        try {
+            var addresses: List<Address> = listOf()
+            val geocoder = Geocoder(requireContext(), Locale.getDefault())
+            addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+            var title: String? = null
+            if (addresses.isNotEmpty()) {
+                val locality = listOf<String?>(
+                    addresses[0].countryName,
+                    addresses[0].adminArea,
+                    addresses[0].subAdminArea,
+                    addresses[0].locality,
+                    addresses[0].subAdminArea,
+                    addresses[0].locality,
+                    addresses[0].postalCode
+                ).distinct().filterNotNull()
+                title = if (locality.isNotEmpty())
+                    "$locality".substring(1, "$locality".length - 1)
+                else
+                    null
             }
-            viewBinding.tgLngLocation -> {
-                if (endMarker == null) {
-                    endMarker =
-                        map.addMarker(markerOptions.icon(BitmapDescriptorFactory.defaultMarker(
-                            BitmapDescriptorFactory.HUE_RED)))
-                } else {
-                    endMarker!!.title = title ?: getString(R.string.Unknown)
-                    endMarker!!.position = latLng
+            viewModel.setAlert(title ?: getString(R.string.Unknown))
+
+            val markerOptions = MarkerOptions().position(latLng).title(title)
+
+            routePolyline?.points = listOf<LatLng>(LatLng(0.0, 0.0))
+
+            when (addMarkerButton) {
+
+                viewBinding.tgLatLocation,
+                -> {
+                    viewBinding.etFirstMarker.setText("${latLng.latitude}, ${latLng.longitude}")
+                    val color = requireActivity().resources.getString(R.color.stroke_color);
+
+                    if (startMarker == null) {
+                        startMarker = map.addMarker(markerOptions.icon(getMarkerIcon(color)))
+                    } else {
+                        startMarker!!.title = title ?: getString(R.string.Unknown)
+                        startMarker!!.position = latLng
+                    }
 
                 }
-                viewBinding.etSecondMarker.setText("${latLng.latitude}, ${latLng.longitude}")
+                viewBinding.tgLngLocation -> {
+                    if (endMarker == null) {
+                        endMarker =
+                            map.addMarker(markerOptions.icon(BitmapDescriptorFactory.defaultMarker(
+                                BitmapDescriptorFactory.HUE_RED)))
+                    } else {
+                        endMarker!!.title = title ?: getString(R.string.Unknown)
+                        endMarker!!.position = latLng
+
+                    }
+                    viewBinding.etSecondMarker.setText("${latLng.latitude}, ${latLng.longitude}")
+                }
             }
+            if (viewBinding.tgAutoZoom.isChecked)
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14F))
+            addMarkerButton?.isChecked = false
+        } catch (ex: IOException) {
+            viewModel.setAlert("Проверьте подключение к интернету.")
         }
-        if (viewBinding.tgAutoZoom.isChecked)
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14F))
-        addMarkerButton?.isChecked = false
 
 
     }
@@ -375,55 +387,56 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
             viewModel.setAlert(requireActivity().getString(R.string.invalid_coordinates))
         }
 
-    }
+
+}
 
 
-    /**
-     * Рисование полигона, пригодится когда надо выделить участки
-     */
-    private fun drawPolygon() {
-        viewBinding.tvTime.visibility = View.GONE
-        startMarker = null
-        endMarker = null
-        routePolyline = null
-        map.clear()
+/**
+ * Рисование полигона, пригодится когда надо выделить участки
+ */
+private fun drawPolygon(coordinates: Coordinates) {
+    viewBinding.tvTime.visibility = View.GONE
+    startMarker = null
+    endMarker = null
+    routePolyline = null
+    map.clear()
 
-        val polygons = coordinates.features[0].geometry.polygons
-        Log.i("GMap", "Polygons size: ${polygons.size}")
-        var distance: Double = 0.0
-        val allCoordinates: MutableList<LatLng> = mutableListOf()
-        val boundsBuilder = LatLngBounds.builder()
-        for (_polygon in polygons) {
-            val polygonOptions = PolygonOptions()
-            for (_hole in _polygon.holes) {
-                allCoordinates.addAll(_hole.coordinates)
-                if (_polygon.coordinates == null) {
-                    polygonOptions.addAll(_hole.coordinates)
-                } else {
-                    polygonOptions.addAll(_polygon.coordinates)
-                    polygonOptions.addHole(_hole.coordinates)
-                }
+    val polygons = coordinates.features[0].geometry.polygons
+    Log.i("GMap", "Polygons size: ${polygons.size}")
+    var distance: Double = 0.0
+    val allCoordinates: MutableList<LatLng> = mutableListOf()
+    val boundsBuilder = LatLngBounds.builder()
+    for (_polygon in polygons) {
+        val polygonOptions = PolygonOptions()
+        for (_hole in _polygon.holes) {
+            allCoordinates.addAll(_hole.coordinates)
+            if (_polygon.coordinates == null) {
+                polygonOptions.addAll(_hole.coordinates)
+            } else {
+                polygonOptions.addAll(_polygon.coordinates)
+                polygonOptions.addHole(_hole.coordinates)
             }
-            polygonOptions
-                .strokeColor(requireActivity().getColor(R.color.stroke_color))
-                .strokeWidth(5.0f)
-            routePolygon.add(map.addPolygon(polygonOptions))
-
         }
-        allCoordinates.forEach {
-            boundsBuilder.include(it)
-        }
-        latLangBounds = boundsBuilder.build()
+        polygonOptions
+            .strokeColor(requireActivity().getColor(R.color.stroke_color))
+            .strokeWidth(5.0f)
+        routePolygon.add(map.addPolygon(polygonOptions))
 
-
-        if (viewBinding.tgAutoZoom.isChecked)
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLangBounds.center, 1F))
-        distance = SphericalUtil.computeLength(allCoordinates)
-        systemGeometry = requireActivity().getString(R.string.meter_squared)
-        distanceText = ""
-        viewModel.setDistance(distance)
-        Log.i("GMap", "Distance: $distance")
     }
+    allCoordinates.forEach {
+        boundsBuilder.include(it)
+    }
+    latLangBounds = boundsBuilder.build()
+
+
+    if (viewBinding.tgAutoZoom.isChecked)
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLangBounds.center, 1F))
+    distance = SphericalUtil.computeLength(allCoordinates)
+    systemGeometry = requireActivity().getString(R.string.meter_squared)
+    distanceText = ""
+    viewModel.setDistance(distance)
+    Log.i("GMap", "Distance: $distance")
+}
 
 
 }
