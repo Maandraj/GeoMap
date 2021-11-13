@@ -3,7 +3,7 @@
 Маршруты на карте
 
 ## Установка:
-  - Для работы нужны ключ Google api map & Google api directions
+  - Для работы нужнен ключ Google api map & Google api directions
 
 ## Функции
 - Построение маршрута от пользователя по долготе и широте
