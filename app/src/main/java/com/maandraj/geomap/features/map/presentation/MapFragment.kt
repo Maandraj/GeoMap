@@ -150,6 +150,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
                     "${activity?.getString(R.string.distance)}: $it $systemGeometry"
         })
         options.mapType(GoogleMap.MAP_TYPE_HYBRID)
+        options.zoomControlsEnabled(false)
         viewModel.coordinates.observe(viewLifecycleOwner, {
             coordinates = it
             val mapFragment = childFragmentManager
