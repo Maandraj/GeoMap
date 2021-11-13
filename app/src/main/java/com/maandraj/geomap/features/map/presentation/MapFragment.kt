@@ -39,10 +39,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 import com.google.android.gms.maps.model.BitmapDescriptor
 
-
-
-
-
 @AndroidEntryPoint
 class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickListener,
     OnMapReadyCallback {
@@ -58,7 +54,6 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
     private var systemGeometry: String = ""
     private var distanceText = ""
     private var typeRoute = "walking"
-
     private var startMarker: Marker? = null
     private var endMarker: Marker? = null
 
@@ -80,7 +75,6 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
                 View.VISIBLE
             else
                 View.GONE
-
         })
         with(viewBinding.btnClose) {
             setOnClickListener {
@@ -100,15 +94,11 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
                 if (isChecked) {
                     manualCoordinates = false
                     when (checkedId) {
-                        R.id.tg_lat_location -> {
-
+                        R.id.tg_lat_location ->
                             addMarkerButton = viewBinding.tgLatLocation
-                        }
-                        R.id.tg_lng_location -> {
 
-
+                        R.id.tg_lng_location ->
                             addMarkerButton = viewBinding.tgLngLocation
-                        }
                     }
                 } else
                     manualCoordinates = true
@@ -136,7 +126,6 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
             if (actionId != EditorInfo.IME_ACTION_SEND) {
                 addMarkerButton = viewBinding.tgLatLocation
                 manualTextCoordinates(v)
-
             } else {
                 manualTextCoordinates(v)
             }
@@ -168,8 +157,6 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
             SupportMapFragment.newInstance(options)
             mapFragment?.getMapAsync(this)
         })
-
-
     }
 
     /**
@@ -196,7 +183,6 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
         when (requireContext().resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
             Configuration.UI_MODE_NIGHT_YES -> setStyleMap()
         }
-
         viewBinding.ivMenu.visibility = View.VISIBLE
         viewBinding.llPanel.visibility = View.VISIBLE
         with(viewBinding.btnCoordinates) {
@@ -251,6 +237,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
 
         }
     }
+
     /**
      * Установка маркеров для постороения дальнейшего маршрута
      */
@@ -272,7 +259,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
                 addresses[0].postalCode
             ).distinct()
             title =
-                "$locality".substring(1, "$locality".length -1 ).replace(
+                "$locality".substring(1, "$locality".length - 1).replace(
                     ", null",
                     "")
         }
@@ -309,17 +296,16 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
                 }
             }
         }
-
-
-
         addMarkerButton?.isChecked = false
 
     }
+
     fun getMarkerIcon(color: String?): BitmapDescriptor? {
         val hsv = FloatArray(3)
         Color.colorToHSV(Color.parseColor(color), hsv)
         return BitmapDescriptorFactory.defaultMarker(hsv[0])
     }
+
     override fun onMarkerClick(marker: Marker): Boolean {
         return true
     }
@@ -336,19 +322,21 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
             )
             viewModel.direction.observe(viewLifecycleOwner, {
                 viewBinding.tvTime.visibility = View.VISIBLE
-                val steps : MutableList<MutableList<LatLng>> = mutableListOf()
-                for (route in it.routes){
-                    for (leg in route.legs){
+                val steps: MutableList<MutableList<LatLng>> = mutableListOf()
+                for (route in it.routes) {
+                    for (leg in route.legs) {
                         viewModel.setDistance(leg.distance.value.toDouble())
                         viewBinding.tvTime.text = leg.duration.text
                         distanceText = leg.distance.text
-                        for (step in leg.steps){
-                            val startLatLng =  PolyUtil.decode(step.polyline.points)
+                        for (step in leg.steps) {
+                            val startLatLng = PolyUtil.decode(step.polyline.points)
                             steps.add(startLatLng)
-                        }}}
+                        }
+                    }
+                }
                 val allPoints = mutableListOf<LatLng>()
-                steps.forEach { _steps->
-                    _steps.forEach { point-> allPoints.add(point)}
+                steps.forEach { _steps ->
+                    _steps.forEach { point -> allPoints.add(point) }
                 }
                 if (routePolyline != null)
                     routePolyline!!.points = allPoints
@@ -362,7 +350,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
                 }
 
             })
-        }else{
+        } else {
             viewModel.setAlert(requireActivity().getString(R.string.invalid_coordinates))
         }
 
@@ -406,11 +394,10 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLangBounds.center, 1F))
         distance = SphericalUtil.computeLength(allCoordinates)
         systemGeometry = requireActivity().getString(R.string.meter_squared)
-        distanceText=""
+        distanceText = ""
         viewModel.setDistance(distance)
         Log.i("GMap", "Distance: $distance")
     }
-
 
 
 }

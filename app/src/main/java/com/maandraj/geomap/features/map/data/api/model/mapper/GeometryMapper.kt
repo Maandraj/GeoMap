@@ -1,6 +1,5 @@
 package com.maandraj.geomap.features.map.data.api.model.mapper
 
-import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.maandraj.geomap.features.map.data.api.model.GeometryRes
 import com.maandraj.geomap.features.map.data.domain.model.Geometry

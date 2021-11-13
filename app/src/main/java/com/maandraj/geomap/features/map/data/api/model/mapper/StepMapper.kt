@@ -1,12 +1,6 @@
 package com.maandraj.geomap.features.map.data.api.model.mapper
 
-import com.maandraj.geomap.features.map.data.api.model.direction.DirectionRes
-import com.maandraj.geomap.features.map.data.api.model.direction.RouteRes
 import com.maandraj.geomap.features.map.data.api.model.direction.StepRes
-import com.maandraj.geomap.features.map.data.domain.model.Coordinates
-import com.maandraj.geomap.features.map.data.domain.model.direction.Direction
-import com.maandraj.geomap.features.map.data.domain.model.direction.Polyline
-import com.maandraj.geomap.features.map.data.domain.model.direction.Route
 import com.maandraj.geomap.features.map.data.domain.model.direction.Step
 import javax.inject.Inject
 
