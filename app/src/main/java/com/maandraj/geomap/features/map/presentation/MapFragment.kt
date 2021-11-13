@@ -243,6 +243,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
      */
     @SuppressLint("SetTextI18n", "ResourceType")
     private fun addMarker(latLng: LatLng) {
+
         var addresses: List<Address> = listOf()
         val geocoder = Geocoder(requireContext(), Locale.getDefault())
         addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
@@ -276,24 +277,27 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
                 viewBinding.etFirstMarker.setText("${latLng.latitude}, ${latLng.longitude}")
                 val color = requireActivity().resources.getString(R.color.stroke_color);
 
-                if (startMarker == null)
+                if (startMarker == null || isClearMap) {
+                    isClearMap = false
                     startMarker = map.addMarker(markerOptions.icon(getMarkerIcon(color)))
-                else {
+                } else {
                     startMarker!!.title = title ?: getString(R.string.Unknown)
                     startMarker!!.position = latLng
                 }
 
             }
             viewBinding.tgLngLocation -> {
-                viewBinding.etSecondMarker.setText("${latLng.latitude}, ${latLng.longitude}")
-                if (endMarker == null)
+                if (endMarker == null || isClearMap) {
+                    isClearMap = false
+
                     endMarker =
                         map.addMarker(markerOptions.icon(BitmapDescriptorFactory.defaultMarker(
                             BitmapDescriptorFactory.HUE_RED)))
-                else {
+                } else {
                     endMarker!!.title = title ?: getString(R.string.Unknown)
                     endMarker!!.position = latLng
                 }
+                viewBinding.etSecondMarker.setText("${latLng.latitude}, ${latLng.longitude}")
             }
         }
         addMarkerButton?.isChecked = false
@@ -356,10 +360,13 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
 
     }
 
+    private var isClearMap: Boolean = false
+
     /**
      * Рисование полигона, пригодится когда надо выделить участки
      */
     private fun drawPolygon() {
+        isClearMap = true
         map.clear()
         val polygons = coordinates.features[0].geometry.polygons
         Log.i("GMap", "Polygons size: ${polygons.size}")
