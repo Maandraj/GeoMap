@@ -262,8 +262,17 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
 
         var title: String? = null
         if (addresses.isNotEmpty()) {
+            val locality = listOf<String?>(
+                addresses[0].countryName,
+                addresses[0].adminArea,
+                addresses[0].subAdminArea,
+                addresses[0].locality,
+                addresses[0].subAdminArea,
+                addresses[0].locality,
+                addresses[0].postalCode
+            ).distinct()
             title =
-                "${addresses[0].countryName}, ${addresses[0].adminArea}, ${addresses[0].locality}".replace(
+                "$locality".substring(1, "$locality".length -1 ).replace(
                     ", null",
                     "")
         }
@@ -401,5 +410,7 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
         viewModel.setDistance(distance)
         Log.i("GMap", "Distance: $distance")
     }
+
+
 
 }

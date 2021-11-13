@@ -52,6 +52,7 @@ dependencies {
     implementation("com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.4.7")
     //Gmaps
     implementation 'com.google.android.gms:play-services-maps:18.0.0'
+    //noinspection GradleDynamicVersion
     implementation 'com.google.maps.android:android-maps-utils:0.5+'
 
     def coroutinesVersion = "1.5.1"
