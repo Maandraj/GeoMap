@@ -343,8 +343,10 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
                     viewBinding.etSecondMarker.setText("${latLng.latitude}, ${latLng.longitude}")
                 }
             }
-            if (viewBinding.tgAutoZoom.isChecked)
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14F))
+            if (viewBinding.tgAutoZoom.isChecked){
+                if(map.cameraPosition.zoom < 15.0f)
+                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))}
+
             addMarkerButton?.isChecked = false
         } catch (ex: IOException) {
             viewModel.setAlert("Проверьте подключение к интернету.")
