@@ -215,7 +215,7 @@
         android:id="@+id/btn_coordinates"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="25dp"
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="@string/get_server_coordinates"

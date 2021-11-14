@@ -38,7 +38,6 @@ class MapViewModel @Inject constructor(
     val distance = _distance.asLiveData()
 
 
-
     /**
      * Получение координат из сервера
      */
@@ -48,68 +47,58 @@ class MapViewModel @Inject constructor(
 
             try {
                 _coordinates.postValue(coordinatesInteractor.getAllCoordinates())
-
             } catch (ex: IOException) {
                 _alert.postValue("Проверьте подключение к интернету.")
-
-
             } catch (ex: Exception) {
                 _alert.postValue("Произошла ошибка, попробуйте снова.")
             }
             _loadingState.postValue(false)
 
-
-
         }
-}
+    }
 
-        /**
-         * Получение маршрута
-         */
-        fun getDirection(
-            origin: String,
-            destination: String,
-            language: String = Locale.getDefault().language,
-            mode: String = "walking",
-        ) {
-            viewModelScope.launch {
-                _loadingState.postValue(true)
+    /**
+     * Получение маршрута
+     */
+    fun getDirection(
+        origin: String,
+        destination: String,
+        language: String = Locale.getDefault().language,
+        mode: String = "walking",
+    ) {
+        viewModelScope.launch {
+            _loadingState.postValue(true)
+            try {
+                val direction = coordinatesInteractor.getDirection(origin = origin,
+                    destination = destination,
+                    language = language,
+                    mode = mode)
+                _direction.postValue(direction)
 
-                try {
-                    val direction = coordinatesInteractor.getDirection(origin = origin,
-                        destination = destination,
-                        language = language,
-                        mode = mode)
-                    _direction.postValue(direction)
+            } catch (ex: IOException) {
+                _alert.postValue("Проверьте подключение к интернету.")
 
-                }
-                catch (ex: IOException) {
-                    _alert.postValue("Проверьте подключение к интернету.")
-
-                } catch (ex: JsonDataException) {
-                    _alert.postValue("Маршрутов не найдено.")
-                } catch (ex: Exception) {
-                    _alert.postValue("Произошла ошибка, попробуйте снова.")
-                }
-                _loadingState.postValue(false)
-
-
-            }}
-
-            fun setDistance(distance: Double) {
-                viewModelScope.launch {
-
-                    _distance.postValue(distance)
-                }
+            } catch (ex: JsonDataException) {
+                _alert.postValue("Маршрутов не найдено.")
+            } catch (ex: Exception) {
+                _alert.postValue("Произошла ошибка, попробуйте снова.")
             }
+            _loadingState.postValue(false)
+        }
+    }
 
-            /**
-             * Отправка сообщения пользователю
-             */
-            fun setAlert(text: String) {
-                viewModelScope.launch {
-                    _alert.postValue(text)
-                }
-            }
+    fun setDistance(distance: Double) {
+        viewModelScope.launch {
+            _distance.postValue(distance)
+        }
+    }
 
+    /**
+     * Отправка сообщения пользователю
+     */
+    fun setAlert(text: String) {
+        viewModelScope.launch {
+            _alert.postValue(text)
+        }
+    }
 }

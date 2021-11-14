@@ -213,8 +213,6 @@ class MapFragment : Fragment(R.layout.fragment_map), GoogleMap.OnMarkerClickList
 
         }
         viewModel.direction.observe(viewLifecycleOwner, {
-
-            drawRoute()
             viewBinding.tvTime.visibility = View.VISIBLE
             val steps: MutableList<MutableList<LatLng>> = mutableListOf()
             for (route in it.routes) {
