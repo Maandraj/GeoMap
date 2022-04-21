@@ -13,7 +13,15 @@
 
 ## Технологи
 Для правильной работы проект следует стандартам современного програмирования
+- Retrofit
+- LiveData
+- NavСomponent
+- Moshi
+- Corountines
+- Glide
 - Hilt
+- Google maps
+- Google directions
 - Retrofit
 - MVVM
 - Clean architecture
